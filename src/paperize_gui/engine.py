@@ -8,9 +8,14 @@ from typing import Callable
 
 import pymupdf
 from PySide6.QtGui import QImage, QPixmap
-from paperize.config import TransformRequest, UnitAmount
-from paperize.pdf import paperize
-from paperize.presets import PRESETS, get_preset
+try:
+    from paperize.config import TransformRequest, UnitAmount
+    from paperize.pdf import paperize
+    from paperize.presets import PRESETS, get_preset
+except ImportError:
+    from paperize_gui.vendor.paperize.config import TransformRequest, UnitAmount
+    from paperize_gui.vendor.paperize.pdf import paperize
+    from paperize_gui.vendor.paperize.presets import PRESETS, get_preset
 
 
 def pixmap_from_pymupdf(pix: pymupdf.Pixmap) -> QPixmap:
