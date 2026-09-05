@@ -5,6 +5,7 @@ import os
 import shutil
 import subprocess
 import zipfile
+import sys
 from pathlib import Path
 
 ROOT_DIR = Path(__file__).resolve().parent.parent
@@ -15,12 +16,21 @@ VERSION = "0.1.0"
 PKG_NAME = "paperizer"
 WHEEL_NAME = f"{PKG_NAME}-{VERSION}-py3-none-any.whl"
 WHEEL_PATH = DIST_DIR / WHEEL_NAME
+PY_VER = f"python{sys.version_info.major}.{sys.version_info.minor}"
 
 
 def build_wheel() -> Path:
     print("[1/4] Building Python wheel...")
+    python_bin = sys.executable
+    venv_py = ROOT_DIR / ".venv/bin/python"
+    try:
+        subprocess.check_call([python_bin, "-c", "import build"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    except Exception:
+        if venv_py.exists():
+            python_bin = str(venv_py)
+
     subprocess.check_call([
-        ROOT_DIR / ".venv/bin/python", "-m", "build", "--wheel", "--outdir", str(DIST_DIR)
+        python_bin, "-m", "build", "--wheel", "--outdir", str(DIST_DIR)
     ], cwd=str(ROOT_DIR))
     print("✓ Wheel ready:", WHEEL_PATH)
     return WHEEL_PATH
@@ -34,7 +44,7 @@ def build_arch_pkg() -> Path:
     build_dir.mkdir(parents=True)
 
     # 1. Unpack wheel into site-packages
-    site_packages = build_dir / "usr/lib/python3.14/site-packages"
+    site_packages = build_dir / f"usr/lib/{PY_VER}/site-packages"
     site_packages.mkdir(parents=True)
     with zipfile.ZipFile(WHEEL_PATH, "r") as z:
         z.extractall(site_packages)
@@ -175,7 +185,7 @@ def build_rpm_pkg() -> Path:
     source_stage.mkdir(parents=True)
 
     # 1. Populate source_stage
-    py_dir = source_stage / "usr/lib/python3.14/site-packages"
+    py_dir = source_stage / f"usr/lib/{PY_VER}/site-packages"
     py_dir.mkdir(parents=True)
     with zipfile.ZipFile(WHEEL_PATH, "r") as z:
         z.extractall(py_dir)
@@ -227,7 +237,7 @@ cp -r {source_stage}/* %{{buildroot}}/
 %files
 /usr/bin/paperizer
 /usr/bin/paperize-gui
-/usr/lib/python3.14/site-packages/*
+/usr/lib/python*/*-packages/*
 /usr/share/applications/paperizer.desktop
 /usr/share/icons/hicolor/scalable/apps/paperizer.svg
 /usr/share/licenses/paperizer/LICENSE
