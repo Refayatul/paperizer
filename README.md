@@ -52,8 +52,8 @@ graph TD
 ### 1. Arch Linux / CachyOS (via AUR / PKGBUILD)
 
 ```bash
-git clone https://github.com/kai/paperize-gui.git
-cd paperize-gui
+git clone https://github.com/Refayatul/paperizer.git
+cd paperizer
 makepkg -si
 ```
 
@@ -61,8 +61,8 @@ makepkg -si
 
 ```bash
 # Clone the repository
-git clone https://github.com/kai/paperize-gui.git
-cd paperize-gui
+git clone https://github.com/Refayatul/paperizer.git
+cd paperizer
 
 # Create a virtual environment
 python3 -m venv .venv
@@ -72,7 +72,7 @@ source .venv/bin/activate
 pip install -e .
 
 # Run the app
-paperize-gui
+paperizer
 ```
 
 ---
@@ -81,21 +81,32 @@ paperize-gui
 
 ```bash
 # Launch GUI directly
-paperize-gui
+paperizer
 
 # Open a specific PDF immediately on launch
-paperize-gui path/to/document.pdf
+paperizer path/to/document.pdf
 ```
 
-### Keyboard Shortcuts
-- `Ctrl + O`: Open PDF
-- `Ctrl + S`: Export current document
-- `Ctrl + +` / `Ctrl + -`: Zoom in / Zoom out
-- `PageUp` / `PageDown`: Previous / Next page
-- `Ctrl + Wheel`: Zoom canvas
+### Keyboard & Reading Shortcuts
+
+| Shortcut | Action |
+| :--- | :--- |
+| **`0`** or **`R`** | **Fit to Reading** (life-size book reading width) |
+| **`W`** | **Fit Width** |
+| **`P`** | **Fit Page** (full-page overview) |
+| **`+`** / **`-`** (or `Ctrl` + Scroll) | Zoom in / Zoom out |
+| **`Up`** / **`Down`** (or Mouse Scroll) | Smooth vertical reading pan |
+| **`PageUp`** / **`PageDown`** | Fast scroll jump |
+| **`Space`** / **`→`** / **`←`** | Next / Previous page |
+| **`1`** / **`2`** / **`3`** | Parchment / Cream / Sepia presets |
+| **`Tab`** | Toggle Split Curtain ↔ Full Paper |
+| **`F`** / **`F11`** | Distraction-free Fullscreen |
+| **`Ctrl + O`** | Open PDF document |
+| **`Ctrl + S`** | Export paperized PDF |
 
 ---
 
 ## License
 
-MIT License. Core PDF stream algorithm courtesy of [Humanitas Labs / Paperize](https://github.com/humanitas-labs/paperize).
+MIT License. Core PDF stream transformation algorithm courtesy of [Humanitas Labs / Paperize](https://github.com/humanitas-labs/paperize).
+
