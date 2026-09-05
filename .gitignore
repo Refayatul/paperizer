@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+*.egg-info/
+build/
+dist/
+tests/sample*.pdf
+tests/test_doc*.pdf
+tests/converted*.pdf

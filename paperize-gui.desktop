@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Paperize
+GenericName=PDF Eye-Comfort & Paper Styler
+Comment=Transform glaring white PDFs into warm, comfortable paper
+Exec=paperize-gui %U
+Icon=paperize-gui
+Terminal=false
+Type=Application
+Categories=Office;Graphics;Viewer;Utility;Qt;
+MimeType=application/pdf;
+Keywords=pdf;reader;paper;sepia;parchment;warmth;comfort;accessibility;
+StartupNotify=true
+StartupWMClass=paperize-gui
