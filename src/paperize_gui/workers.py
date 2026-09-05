@@ -23,7 +23,7 @@ class PreviewRenderTask:
         strength: float,
         texture: float | None,
         vignette: float | None,
-        dpi: int = 140,
+        dpi: int = 240,
     ):
         self.request_id = request_id
         self.doc_state = doc_state

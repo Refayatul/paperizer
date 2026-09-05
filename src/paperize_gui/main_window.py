@@ -222,7 +222,7 @@ class MainWindow(QMainWindow):
         pill_layout.addWidget(lbl_warmth)
         self.slider_warmth = QSlider(Qt.Orientation.Horizontal)
         self.slider_warmth.setRange(20, 100)
-        self.slider_warmth.setValue(100)
+        self.slider_warmth.setValue(85)
         self.slider_warmth.setFixedWidth(70)
         self.slider_warmth.setToolTip("Warmth Strength")
         self.slider_warmth.valueChanged.connect(lambda: self._preview_debounce_timer.start())

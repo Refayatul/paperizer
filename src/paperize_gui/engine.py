@@ -36,7 +36,7 @@ class PdfDocumentState:
         if self.doc and not self.doc.is_closed:
             self.doc.close()
 
-    def render_original_page(self, page_index: int, dpi: int = 150) -> QPixmap:
+    def render_original_page(self, page_index: int, dpi: int = 240) -> QPixmap:
         """Render the original unmodified page as a QPixmap."""
         if not (0 <= page_index < self.page_count):
             raise IndexError(f"Page index {page_index} out of bounds (0-{self.page_count - 1})")
@@ -51,7 +51,7 @@ class PdfDocumentState:
         strength: float = 1.0,
         texture: float | None = None,
         vignette: float | None = None,
-        dpi: int = 150,
+        dpi: int = 240,
     ) -> QPixmap:
         """Extract a single page, transform it with paperize, and render as QPixmap."""
         if not (0 <= page_index < self.page_count):
