@@ -17,6 +17,7 @@
   - PyMuPDF (`fitz`) for 240 DPI retina rendering
   - `pikepdf` for vector stream transformation
   - Vendored fallback engine in `src/paperize_gui/vendor/paperize/` (zero missing Arch dependencies)
+- **Maintainer OS & Hardware**: Kai runs **Arch Linux (CachyOS)**. Kai **does not own a Mac** and cannot manually test macOS builds. macOS builds are strictly automated, best-effort CI jobs (`continue-on-error: true`) and must never block Linux or Windows releases.
 
 ---
 
