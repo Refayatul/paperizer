@@ -47,17 +47,38 @@ graph TD
 
 ---
 
-## Installation & Setup
+## Installation
 
-### 1. Arch Linux / CachyOS (via AUR / PKGBUILD)
+### 1. Arch Linux / CachyOS / Manjaro
 
+**Direct native install (1-liner):**
 ```bash
-git clone https://github.com/Refayatul/paperizer.git
-cd paperizer
-makepkg -si
+sudo pacman -U https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-1-any.pkg.tar.zst
 ```
 
-### 2. Manual / Developer Installation
+**Or via AUR:**
+```bash
+yay -S paperizer
+# or for git master:
+yay -S paperizer-git
+```
+
+### 2. Debian / Ubuntu / Linux Mint / Pop!_OS
+
+Download and install the native `.deb`:
+```bash
+curl -LO https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer_0.1.0-1_all.deb
+sudo apt install ./paperizer_0.1.0-1_all.deb
+```
+
+### 3. Fedora / RHEL / openSUSE
+
+Direct RPM install:
+```bash
+sudo dnf install https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-1.noarch.rpm
+```
+
+### 4. Developer / From Source
 
 ```bash
 # Clone the repository
