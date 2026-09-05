@@ -1,0 +1,27 @@
+pkgbase = paperizer-bin
+	pkgdesc = A quiet, native PDF reader & warm paper styler for Linux (pre-built release)
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/Refayatul/paperizer
+	arch = any
+	license = MIT
+	makedepends = python-installer
+	depends = python>=3.11
+	depends = pyside6
+	depends = python-pikepdf
+	depends = python-pymupdf
+	provides = paperizer
+	provides = paperize-gui
+	conflicts = paperizer
+	conflicts = paperizer-git
+	conflicts = paperize-gui
+	source = https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-py3-none-any.whl
+	source = https://raw.githubusercontent.com/Refayatul/paperizer/v0.1.0/paperizer.desktop
+	source = https://raw.githubusercontent.com/Refayatul/paperizer/v0.1.0/assets/icon.svg
+	source = https://raw.githubusercontent.com/Refayatul/paperizer/v0.1.0/LICENSE
+	sha256sums = 7fdb3b609b391153fe5b3a4d698618e78d7db556252cef671c292423ba187289
+	sha256sums = c033818bd6f2258dde9ac6dc8ec8554214cc7df53ec32fdf488f4742ca2aafba
+	sha256sums = 08f4aa4c0960bafb3481a56f034872808ef337c241fb6d9ae2a2a2861375a363
+	sha256sums = eab257ca89e04dfdad0aaa676e0e3ce7abb52cee6d318ef3b2cb4c1d1f877ffd
+
+pkgname = paperizer-bin
