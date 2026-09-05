@@ -94,6 +94,27 @@ def test_main_window_lifecycle(qapp, sample_pdf: Path):
     win._go_to_page(1)
     assert win.current_page_index == 1
 
+    # Zoom controls test
+    assert hasattr(win, "btn_zoom_in")
+    assert hasattr(win, "btn_zoom_out")
+    assert hasattr(win, "slider_zoom")
+    assert hasattr(win, "btn_zoom_label")
+
+    # Zoom in
+    initial_zoom = win.canvas._zoom
+    win.btn_zoom_in.click()
+    assert win.canvas._zoom > initial_zoom
+
+    # Zoom out
+    win.btn_zoom_out.click()
+    
+    # Zoom slider
+    win.slider_zoom.setValue(135)
+    assert win.btn_zoom_label.text() == "135%"
+
+    # Click zoom label to reset
+    win.btn_zoom_label.click()
+
     win.close()
 
 

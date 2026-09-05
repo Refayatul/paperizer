@@ -83,6 +83,17 @@ class FloatingPillDock(QFrame):
             QPushButton#exportBtn:hover {
                 background-color: #D35400;
             }
+            QPushButton#zoomLabelBtn {
+                color: #A1A1AA;
+                font-size: 11px;
+                font-weight: 600;
+                padding: 4px 6px;
+                min-width: 38px;
+            }
+            QPushButton#zoomLabelBtn:hover {
+                color: #FFFFFF;
+                background-color: rgba(255, 255, 255, 0.16);
+            }
             QLabel {
                 color: #A1A1AA;
                 font-size: 12px;
@@ -163,6 +174,7 @@ class MainWindow(QMainWindow):
         # Canvas
         self.canvas = SplitPreviewCanvas(self.central_container)
         self.canvas.activityDetected.connect(self._wake_dock)
+        self.canvas.zoomChanged.connect(self._on_canvas_zoom_changed)
 
         # Floating Bottom Island
         self.pill_dock = FloatingPillDock(self.central_container)
@@ -224,16 +236,48 @@ class MainWindow(QMainWindow):
         self.slider_warmth = QSlider(Qt.Orientation.Horizontal)
         self.slider_warmth.setRange(20, 100)
         self.slider_warmth.setValue(85)
-        self.slider_warmth.setFixedWidth(70)
+        self.slider_warmth.setFixedWidth(64)
         self.slider_warmth.setToolTip("Warmth Strength")
         self.slider_warmth.valueChanged.connect(lambda: self._preview_debounce_timer.start())
         pill_layout.addWidget(self.slider_warmth)
 
         pill_layout.addWidget(self._create_divider())
 
+        # Zoom Controls
+        self.btn_zoom_out = QPushButton("−")
+        self.btn_zoom_out.setFixedWidth(24)
+        self.btn_zoom_out.setStyleSheet("padding: 2px 0px; font-size: 14px; font-weight: bold;")
+        self.btn_zoom_out.setToolTip("Zoom Out (- or Ctrl+Scroll Down)")
+        self.btn_zoom_out.clicked.connect(self._on_zoom_out_clicked)
+        pill_layout.addWidget(self.btn_zoom_out)
+
+        self.slider_zoom = QSlider(Qt.Orientation.Horizontal)
+        self.slider_zoom.setRange(40, 250)
+        self.slider_zoom.setValue(100)
+        self.slider_zoom.setFixedWidth(64)
+        self.slider_zoom.setToolTip("Zoom Level (40% - 250%)")
+        self.slider_zoom.valueChanged.connect(self._on_zoom_slider_changed)
+        pill_layout.addWidget(self.slider_zoom)
+
+        self.btn_zoom_in = QPushButton("+")
+        self.btn_zoom_in.setFixedWidth(24)
+        self.btn_zoom_in.setStyleSheet("padding: 2px 0px; font-size: 14px; font-weight: bold;")
+        self.btn_zoom_in.setToolTip("Zoom In (+ or Ctrl+Scroll Up)")
+        self.btn_zoom_in.clicked.connect(self._on_zoom_in_clicked)
+        pill_layout.addWidget(self.btn_zoom_in)
+
+        self.btn_zoom_label = QPushButton("100%")
+        self.btn_zoom_label.setObjectName("zoomLabelBtn")
+        self.btn_zoom_label.setToolTip("Click to Reset Reading Fit (0 / R)")
+        self.btn_zoom_label.clicked.connect(self._on_zoom_label_clicked)
+        pill_layout.addWidget(self.btn_zoom_label)
+
+        pill_layout.addWidget(self._create_divider())
+
         # Page Controls
         self.btn_prev = QPushButton("‹")
-        self.btn_prev.setFixedWidth(26)
+        self.btn_prev.setFixedWidth(24)
+        self.btn_prev.setStyleSheet("padding: 2px 0px; font-size: 14px; font-weight: bold;")
         self.btn_prev.setToolTip("Previous Page (Left / Backspace)")
         self.btn_prev.clicked.connect(lambda: self._go_to_page(self.current_page_index - 1))
         pill_layout.addWidget(self.btn_prev)
@@ -243,7 +287,8 @@ class MainWindow(QMainWindow):
         pill_layout.addWidget(self.lbl_pages)
 
         self.btn_next = QPushButton("›")
-        self.btn_next.setFixedWidth(26)
+        self.btn_next.setFixedWidth(24)
+        self.btn_next.setStyleSheet("padding: 2px 0px; font-size: 14px; font-weight: bold;")
         self.btn_next.setToolTip("Next Page (Right / Space)")
         self.btn_next.clicked.connect(lambda: self._go_to_page(self.current_page_index + 1))
         pill_layout.addWidget(self.btn_next)
@@ -405,6 +450,33 @@ class MainWindow(QMainWindow):
             vignette=None,  # Use exact author preset formula
         )
         self.preview_worker.submit(task)
+
+    def _on_zoom_out_clicked(self) -> None:
+        self._wake_dock()
+        self.canvas.zoom_out()
+
+    def _on_zoom_in_clicked(self) -> None:
+        self._wake_dock()
+        self.canvas.zoom_in()
+
+    def _on_zoom_label_clicked(self) -> None:
+        self._wake_dock()
+        self.canvas.fit_to_reading()
+
+    def _on_zoom_slider_changed(self, val: int) -> None:
+        self._wake_dock()
+        target_zoom = (val / 100.0) / (240.0 / 96.0)
+        self.canvas.blockSignals(True)
+        self.canvas.set_zoom(target_zoom)
+        self.canvas.blockSignals(False)
+        self.btn_zoom_label.setText(f"{val}%")
+
+    def _on_canvas_zoom_changed(self, zoom: float) -> None:
+        percent = int(round(zoom * (240.0 / 96.0) * 100))
+        self.slider_zoom.blockSignals(True)
+        self.slider_zoom.setValue(max(40, min(percent, 250)))
+        self.slider_zoom.blockSignals(False)
+        self.btn_zoom_label.setText(f"{percent}%")
 
     def _on_preview_ready(self, req_id: int, orig_pix, paper_pix) -> None:
         if req_id == self._current_request_id:
