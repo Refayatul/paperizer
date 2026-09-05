@@ -83,13 +83,14 @@ class SplitPreviewCanvas(QWidget):
         self.fit_to_page()
 
     def fit_to_page(self) -> None:
-        """Fit entire page comfortably within the viewport."""
+        """Fit entire page comfortably within the viewport above the bottom dock."""
         ref_pixmap = self._paperized_pixmap or self._original_pixmap
         if not ref_pixmap or ref_pixmap.isNull():
             return
-        
-        available_w = max(50, self.width() - 60)
-        available_h = max(50, self.height() - 60)
+
+        # Reserve 80px horizontal margin and 110px vertical margin for floating dock
+        available_w = max(50, self.width() - 80)
+        available_h = max(50, self.height() - 120)
 
         if self._view_mode == ViewMode.SIDE_BY_SIDE:
             scale_w = available_w / (ref_pixmap.width() * 2 + 30)
@@ -121,7 +122,7 @@ class SplitPreviewCanvas(QWidget):
         self.update()
 
     def _get_page_rect(self) -> QRectF:
-        """Calculate on-screen target rect for the rendered page."""
+        """Calculate on-screen target rect for the rendered page centered above the dock."""
         ref_pixmap = self._paperized_pixmap or self._original_pixmap
         if not ref_pixmap or ref_pixmap.isNull():
             return QRectF()
@@ -129,8 +130,10 @@ class SplitPreviewCanvas(QWidget):
         target_w = ref_pixmap.width() * self._zoom
         target_h = ref_pixmap.height() * self._zoom
 
+        # Center in the available canvas area above the floating dock (leaving 40px bias)
+        usable_h = self.height() - 60
         x = (self.width() - target_w) / 2.0 + self._pan_offset.x()
-        y = (self.height() - target_h) / 2.0 + self._pan_offset.y()
+        y = max(16.0, (usable_h - target_h) / 2.0) + self._pan_offset.y()
 
         return QRectF(x, y, target_w, target_h)
 
@@ -220,14 +223,20 @@ class SplitPreviewCanvas(QWidget):
         painter.drawLine(QPointF(div_x, page_rect.top()), QPointF(div_x, page_rect.bottom()))
 
         # 4. Draw Grip Handle Circle
-        handle_y = page_rect.center().y()
+        visible_top = max(page_rect.top() + 24, 30.0)
+        visible_bottom = min(page_rect.bottom() - 24, float(self.height() - 90))
+        if visible_bottom > visible_top:
+            handle_y = (visible_top + visible_bottom) / 2.0
+        else:
+            handle_y = page_rect.center().y()
+
         handle_radius = 16.0
-        painter.setPen(QPen(QColor(30, 30, 30, 180), 1.5))
-        painter.setBrush(QBrush(QColor(255, 255, 255, 240)))
+        painter.setPen(QPen(QColor(50, 50, 55, 200), 2))
+        painter.setBrush(QBrush(QColor(255, 255, 255, 250)))
         painter.drawEllipse(QPointF(div_x, handle_y), handle_radius, handle_radius)
 
         # Handle arrows '< | >'
-        painter.setPen(QPen(QColor(60, 60, 60), 2))
+        painter.setPen(QPen(QColor(50, 50, 55), 2))
         painter.drawLine(QPointF(div_x - 5, handle_y - 4), QPointF(div_x - 8, handle_y))
         painter.drawLine(QPointF(div_x - 8, handle_y), QPointF(div_x - 5, handle_y + 4))
 

@@ -7,12 +7,15 @@ from pathlib import Path
 from PySide6.QtCore import QDir, QEvent, QPoint, QSize, QTimer, Qt
 from PySide6.QtGui import (
     QAction,
+    QBrush,
     QColor,
     QDragEnterEvent,
     QDropEvent,
     QFont,
     QIcon,
     QKeySequence,
+    QPainter,
+    QPen,
     QShortcut,
 )
 from PySide6.QtWidgets import (
@@ -46,67 +49,73 @@ class FloatingPillDock(QFrame):
 
         # Drop shadow for floating depth
         shadow = QGraphicsDropShadowEffect(self)
-        shadow.setBlurRadius(28)
-        shadow.setColor(QColor(0, 0, 0, 110))
+        shadow.setBlurRadius(32)
+        shadow.setColor(QColor(0, 0, 0, 160))
         shadow.setOffset(0, 8)
         self.setGraphicsEffect(shadow)
 
         self.setStyleSheet(
             """
-            #FloatingPillDock {
-                background-color: rgba(26, 26, 28, 0.88);
-                border: 1px solid rgba(255, 255, 255, 0.12);
-                border-radius: 22px;
-            }
             QPushButton {
                 background: transparent;
-                color: #B0B0B5;
+                color: #D1D1D6;
                 border: none;
                 border-radius: 14px;
-                padding: 5px 12px;
-                font-size: 12px;
+                padding: 6px 12px;
+                font-size: 13px;
                 font-weight: 500;
             }
             QPushButton:hover {
-                background-color: rgba(255, 255, 255, 0.10);
+                background-color: rgba(255, 255, 255, 0.16);
                 color: #FFFFFF;
             }
             QPushButton:checked {
-                background-color: rgba(255, 255, 255, 0.18);
+                background-color: #D97706;
                 color: #FFFFFF;
                 font-weight: 600;
             }
             QPushButton#exportBtn {
-                background-color: #D97706;
+                background-color: #E67E22;
                 color: #FFFFFF;
                 font-weight: 600;
-                padding: 5px 14px;
+                padding: 6px 16px;
             }
             QPushButton#exportBtn:hover {
-                background-color: #B45309;
+                background-color: #D35400;
             }
             QLabel {
-                color: #8E8E93;
+                color: #A1A1AA;
                 font-size: 12px;
+                font-weight: 500;
             }
             QSlider::groove:horizontal {
                 height: 4px;
-                background: rgba(255, 255, 255, 0.15);
+                background: rgba(255, 255, 255, 0.22);
                 border-radius: 2px;
             }
             QSlider::sub-page:horizontal {
-                background: #D97706;
+                background: #E67E22;
                 border-radius: 2px;
             }
             QSlider::handle:horizontal {
                 background: #FFFFFF;
-                width: 12px;
-                margin-top: -4px;
-                margin-bottom: -4px;
-                border-radius: 6px;
+                width: 14px;
+                margin-top: -5px;
+                margin-bottom: -5px;
+                border-radius: 7px;
             }
             """
         )
+
+    def paintEvent(self, event) -> None:
+        """Explicitly paint a dark glass rounded capsule so it is always 100% visible."""
+        painter = QPainter(self)
+        painter.setRenderHint(QPainter.RenderHint.Antialiasing)
+
+        # Dark sleek background
+        painter.setPen(QPen(QColor(255, 255, 255, 38), 1.2))
+        painter.setBrush(QBrush(QColor(22, 22, 26, 246)))
+        painter.drawRoundedRect(self.rect().adjusted(1, 1, -1, -1), 22, 22)
 
 
 class MainWindow(QMainWindow):
@@ -260,6 +269,9 @@ class MainWindow(QMainWindow):
         pos_y = self.height() - dock_h - 24
         self.pill_dock.setGeometry(pos_x, pos_y, dock_w, dock_h)
 
+        if self.canvas._original_pixmap:
+            self.canvas.fit_to_page()
+
     def _setup_shortcuts(self) -> None:
         # File shortcuts
         QShortcut(QKeySequence("Ctrl+O"), self, self._on_open_file_dialog)
@@ -305,10 +317,10 @@ class MainWindow(QMainWindow):
             self.current_doc_state = PdfDocumentState(path)
             self.current_page_index = 0
             self.lbl_pages.setText(f"1 / {self.current_doc_state.page_count}")
-            self.setWindowTitle(f"Paperize — {path.stem}")
+            self.setWindowTitle(path.name)
 
+            self.canvas.set_pixmaps(None, None)
             self._request_preview_render()
-            self.canvas.reset_view()
 
         except Exception as exc:
             QMessageBox.critical(self, "Could Not Open", f"Unable to open '{path.name}':\n{exc}")
@@ -350,7 +362,10 @@ class MainWindow(QMainWindow):
 
     def _on_preview_ready(self, req_id: int, orig_pix, paper_pix) -> None:
         if req_id == self._current_request_id:
+            first_load = (self.canvas._original_pixmap is None)
             self.canvas.set_pixmaps(orig_pix, paper_pix)
+            if first_load:
+                self.canvas.fit_to_page()
 
     def _on_preview_failed(self, req_id: int, error_msg: str) -> None:
         pass
