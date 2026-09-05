@@ -1,17 +1,20 @@
 # Paperize GUI 📜✨
 
-> **Turn glaring white PDF pages into warm, comfortable paper — with live split-screen preview and vector preservation.**
-
-A native Linux desktop application built with **PySide6 (Qt6)**, **PyMuPDF**, and **pikepdf** that non-destructively styles PDF document streams.
+> **A quiet, beautiful PDF reader & paper styler for Linux.**  
+> Inspired by the distraction-free philosophy of [Humanitas Labs' Paper](https://github.com/humanitas-labs/paper) and built on [Paperize](https://github.com/humanitas-labs/paperize).
 
 ![Paperize GUI Banner](assets/icon.svg)
 
 ---
 
-## Key Highlights
+## Design Philosophy: Radical Minimalism
 
-- ⚡ **Non-Destructive Vector Transformation**: Built on [Paperize](https://github.com/humanitas-labs/paperize). Modifies PDF streams directly rather than rasterizing pages into images. Selectable text, searchable content, bookmarks, and links remain intact.
-- 🎚️ **Interactive Split-Screen Curtain**: Compare original stark white pages against warm paper tones with a draggable divider handle.
+Most PDF readers are covered in bulky toolbars, side panels, and menus that invite you to do everything other than read.
+
+**Paperize GUI puts the document first.**
+- **Full-Bleed Quiet Canvas**: Nothing between you and the reading material.
+- **Floating Translucent Capsule**: A subtle glass pill dock floats quietly at the bottom when you need to change presets, adjust warmth, or export.
+- **Non-Destructive Vector Warmth**: Text, vector graphics, and links are never rasterized or degraded. White glare becomes soft paper.
 - 🎨 **Aesthetic Reading Presets**:
   - **Parchment**: Soft golden-warm antique paper with subtle radial falloff.
   - **Cream**: Gentle off-white/ivory ideal for prolonged night reading.
