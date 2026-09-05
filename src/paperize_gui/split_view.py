@@ -11,6 +11,7 @@ from PySide6.QtGui import (
     QFont,
     QMouseEvent,
     QPainter,
+    QPainterPath,
     QPaintEvent,
     QPen,
     QPixmap,
@@ -174,52 +175,59 @@ class SplitPreviewCanvas(QWidget):
 
     def _paint_single_or_split(self, painter: QPainter, ref: QPixmap) -> None:
         page_rect = self._get_page_rect()
+        if page_rect.isEmpty():
+            return
 
-        # Draw Page Drop Shadow
-        shadow_rect = page_rect.translated(4, 6)
+        # 1. Soft multi-layer diffuse paper drop shadow
         painter.setPen(Qt.PenStyle.NoPen)
-        painter.setBrush(QColor(0, 0, 0, 50))
-        painter.drawRoundedRect(shadow_rect, 4, 4)
-
-        # Draw Base Page Border
-        painter.setPen(QColor(100, 100, 100, 80))
-        painter.setBrush(Qt.BrushStyle.NoBrush)
-        painter.drawRect(page_rect)
+        for dy, alpha in ((2, 38), (6, 22), (14, 12)):
+            painter.setBrush(QColor(0, 0, 0, alpha))
+            painter.drawRoundedRect(page_rect.translated(0, dy), 8, 8)
 
         orig_pix = self._original_pixmap or ref
         paper_pix = self._paperized_pixmap or ref
 
+        # 2. Rounded page clipping path
+        page_path = QPainterPath()
+        page_path.addRoundedRect(page_rect, 7, 7)
+
+        painter.save()
+        painter.setClipPath(page_path)
+
         if self._view_mode == ViewMode.ORIGINAL:
             painter.drawPixmap(page_rect.toRect(), orig_pix)
-            self._draw_pill_badge(painter, page_rect.left() + 16, page_rect.top() + 16, "Original (White)")
+            painter.restore()
+            self._draw_page_border(painter, page_rect)
             return
 
         if self._view_mode == ViewMode.PAPERIZED:
             painter.drawPixmap(page_rect.toRect(), paper_pix)
-            self._draw_pill_badge(painter, page_rect.left() + 16, page_rect.top() + 16, "Paperized")
+            painter.restore()
+            self._draw_page_border(painter, page_rect)
             return
 
         # ViewMode.SPLIT:
         div_x = self._get_divider_screen_x(page_rect)
 
-        # 1. Left side (Original): clip to left of divider
+        # Left side (Original): clip to left of divider
         painter.save()
         clip_left = QRectF(page_rect.left(), page_rect.top(), div_x - page_rect.left(), page_rect.height())
         painter.setClipRect(clip_left)
         painter.drawPixmap(page_rect.toRect(), orig_pix)
-        self._draw_pill_badge(painter, page_rect.left() + 16, page_rect.top() + 16, "Original")
         painter.restore()
 
-        # 2. Right side (Paperized): clip to right of divider
+        # Right side (Paperized): clip to right of divider
         painter.save()
         clip_right = QRectF(div_x, page_rect.top(), page_rect.right() - div_x, page_rect.height())
         painter.setClipRect(clip_right)
         painter.drawPixmap(page_rect.toRect(), paper_pix)
-        self._draw_pill_badge(painter, page_rect.right() - 95, page_rect.top() + 16, "Paperized")
         painter.restore()
 
+        painter.restore()
+        self._draw_page_border(painter, page_rect)
+
         # 3. Draw Splitter Divider Line
-        divider_pen = QPen(QColor(255, 255, 255, 230), 2.5)
+        divider_pen = QPen(QColor(255, 255, 255, 220), 2.0)
         painter.setPen(divider_pen)
         painter.drawLine(QPointF(div_x, page_rect.top()), QPointF(div_x, page_rect.bottom()))
 
@@ -231,18 +239,28 @@ class SplitPreviewCanvas(QWidget):
         else:
             handle_y = page_rect.center().y()
 
-        handle_radius = 16.0
-        painter.setPen(QPen(QColor(50, 50, 55, 200), 2))
+        handle_radius = 15.0
+        painter.setPen(QPen(QColor(40, 40, 45, 180), 2))
         painter.setBrush(QBrush(QColor(255, 255, 255, 250)))
         painter.drawEllipse(QPointF(div_x, handle_y), handle_radius, handle_radius)
 
-        # Handle arrows '< | >'
+        # Handle arrows '< >'
         painter.setPen(QPen(QColor(50, 50, 55), 2))
-        painter.drawLine(QPointF(div_x - 5, handle_y - 4), QPointF(div_x - 8, handle_y))
-        painter.drawLine(QPointF(div_x - 8, handle_y), QPointF(div_x - 5, handle_y + 4))
+        painter.drawLine(QPointF(div_x - 4, handle_y - 4), QPointF(div_x - 7, handle_y))
+        painter.drawLine(QPointF(div_x - 7, handle_y), QPointF(div_x - 4, handle_y + 4))
 
-        painter.drawLine(QPointF(div_x + 5, handle_y - 4), QPointF(div_x + 8, handle_y))
-        painter.drawLine(QPointF(div_x + 8, handle_y), QPointF(div_x + 5, handle_y + 4))
+        painter.drawLine(QPointF(div_x + 4, handle_y - 4), QPointF(div_x + 7, handle_y))
+        painter.drawLine(QPointF(div_x + 7, handle_y), QPointF(div_x + 4, handle_y + 4))
+
+        # Badges only in SPLIT mode
+        self._draw_pill_badge(painter, page_rect.left() + 16, page_rect.top() + 16, "Original")
+        self._draw_pill_badge(painter, page_rect.right() - 95, page_rect.top() + 16, "Paperized")
+
+    def _draw_page_border(self, painter: QPainter, page_rect: QRectF) -> None:
+        """Draw subtle crisp border around the page."""
+        painter.setPen(QPen(QColor(255, 255, 255, 20), 1))
+        painter.setBrush(Qt.BrushStyle.NoBrush)
+        painter.drawRoundedRect(page_rect, 7, 7)
 
     def _paint_side_by_side(self, painter: QPainter, ref: QPixmap) -> None:
         target_w = ref.width() * self._zoom

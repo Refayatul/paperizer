@@ -383,8 +383,8 @@ class MainWindow(QMainWindow):
             page_index=self.current_page_index,
             preset_name=self._get_active_preset_name(),
             strength=self.slider_warmth.value() / 100.0,
-            texture=0.10,
-            vignette=1.0,
+            texture=None,  # Use exact author preset formula
+            vignette=None,  # Use exact author preset formula
         )
         self.preview_worker.submit(task)
 
@@ -420,8 +420,8 @@ class MainWindow(QMainWindow):
                 output=Path(out_file),
                 preset_name=self._get_active_preset_name(),
                 strength=self.slider_warmth.value() / 100.0,
-                texture=0.10,
-                vignette=1.0,
+                texture=None,
+                vignette=None,
                 force=True,
             )
             QMessageBox.information(self, "Saved", f"Exported warm paper document to:\n{result.name}")
