@@ -17,7 +17,11 @@
   - PyMuPDF (`fitz`) for 240 DPI retina rendering
   - `pikepdf` for vector stream transformation
   - Vendored fallback engine in `src/paperize_gui/vendor/paperize/` (zero missing Arch dependencies)
-- **Maintainer OS & Hardware**: Kai runs **Arch Linux (CachyOS)**. Kai **does not own a Mac** and cannot manually test macOS builds. macOS builds are strictly automated, best-effort CI jobs (`continue-on-error: true`) and must never block Linux or Windows releases.
+- **Maintainer Testing Fleet**:
+  1. **Primary Workstation**: **CachyOS / Arch Linux** (KDE Plasma, Wayland) — primary development, packaging, and testing.
+  2. **Device 2**: **Windows 10** — native testing bed for `Paperizer-*-Setup-x64.exe` and portable zip.
+  3. **Device 3**: **Artix Linux (XFCE, `runit` init)** — verifies systemd-free compatibility, X11/xcb rendering, and pacman packages on lightweight desktop environments.
+  4. **macOS Policy**: Kai **does not own a Mac** and cannot test macOS locally. macOS builds must remain strictly automated, best-effort CI jobs (`continue-on-error: true`) and must never block Linux or Windows releases.
 
 ---
 
