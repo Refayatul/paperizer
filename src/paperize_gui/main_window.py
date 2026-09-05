@@ -123,7 +123,7 @@ class MainWindow(QMainWindow):
 
     def __init__(self, initial_file: str | None = None):
         super().__init__()
-        self.setWindowTitle("Paperize")
+        self.setWindowTitle("Paperizer")
         self.resize(1180, 840)
         self.setAcceptDrops(True)
 
@@ -136,6 +136,12 @@ class MainWindow(QMainWindow):
         self._preview_debounce_timer.setSingleShot(True)
         self._preview_debounce_timer.setInterval(120)
         self._preview_debounce_timer.timeout.connect(self._trigger_preview_render)
+
+        # Idle timer for auto-hiding dock during reading
+        self._dock_idle_timer = QTimer(self)
+        self._dock_idle_timer.setSingleShot(True)
+        self._dock_idle_timer.setInterval(3200)
+        self._dock_idle_timer.timeout.connect(self._on_dock_idle)
 
         # Asynchronous worker
         self.preview_worker = PreviewWorker(self)
@@ -155,6 +161,7 @@ class MainWindow(QMainWindow):
 
         # Canvas
         self.canvas = SplitPreviewCanvas(self.central_container)
+        self.canvas.activityDetected.connect(self._wake_dock)
 
         # Floating Bottom Island
         self.pill_dock = FloatingPillDock(self.central_container)
@@ -193,20 +200,20 @@ class MainWindow(QMainWindow):
 
         pill_layout.addWidget(self._create_divider())
 
-        # View Mode Toggle: Split / Paper / White
+        # View Mode Toggle: Paper (default) / Split
         self.view_group = QButtonGroup(self)
-        self.btn_mode_split = QPushButton("Split")
-        self.btn_mode_split.setCheckable(True)
-        self.btn_mode_split.setChecked(True)
-        self.btn_mode_split.clicked.connect(lambda: self.canvas.set_view_mode(ViewMode.SPLIT))
-        self.view_group.addButton(self.btn_mode_split)
-        pill_layout.addWidget(self.btn_mode_split)
-
         self.btn_mode_paper = QPushButton("Paper")
         self.btn_mode_paper.setCheckable(True)
+        self.btn_mode_paper.setChecked(True)
         self.btn_mode_paper.clicked.connect(lambda: self.canvas.set_view_mode(ViewMode.PAPERIZED))
         self.view_group.addButton(self.btn_mode_paper)
         pill_layout.addWidget(self.btn_mode_paper)
+
+        self.btn_mode_split = QPushButton("Split")
+        self.btn_mode_split.setCheckable(True)
+        self.btn_mode_split.clicked.connect(lambda: self.canvas.set_view_mode(ViewMode.SPLIT))
+        self.view_group.addButton(self.btn_mode_split)
+        pill_layout.addWidget(self.btn_mode_split)
 
         pill_layout.addWidget(self._create_divider())
 
@@ -291,6 +298,25 @@ class MainWindow(QMainWindow):
         # Toggle view mode
         QShortcut(QKeySequence("Tab"), self, self._cycle_view_mode)
 
+        # Fullscreen (F, F11)
+        QShortcut(QKeySequence("F"), self, self._toggle_fullscreen)
+        QShortcut(QKeySequence("F11"), self, self._toggle_fullscreen)
+
+    def _wake_dock(self) -> None:
+        self.pill_dock.show()
+        if self.current_doc_state:
+            self._dock_idle_timer.start(3200)
+
+    def _on_dock_idle(self) -> None:
+        if not self.pill_dock.underMouse():
+            self.pill_dock.hide()
+
+    def _toggle_fullscreen(self) -> None:
+        if self.isFullScreen():
+            self.showNormal()
+        else:
+            self.showFullScreen()
+
     def _activate_preset(self, name: str) -> None:
         if name == "parchment":
             self.btn_parchment.setChecked(True)
@@ -321,6 +347,7 @@ class MainWindow(QMainWindow):
 
             self.canvas.set_pixmaps(None, None)
             self._request_preview_render()
+            self._wake_dock()
 
         except Exception as exc:
             QMessageBox.critical(self, "Could Not Open", f"Unable to open '{path.name}':\n{exc}")
@@ -328,6 +355,7 @@ class MainWindow(QMainWindow):
     def _go_to_page(self, index: int) -> None:
         if not self.current_doc_state:
             return
+        self._wake_dock()
         clamped = max(0, min(index, self.current_doc_state.page_count - 1))
         if clamped != self.current_page_index:
             self.current_page_index = clamped

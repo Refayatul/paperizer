@@ -21,10 +21,10 @@ def main() -> None:
         os.environ["QT_QPA_PLATFORM"] = "wayland;xcb"
 
     app = QApplication(sys.argv)
-    app.setApplicationName("paperize-gui")
-    app.setApplicationDisplayName("Paperize")
+    app.setApplicationName("paperizer")
+    app.setApplicationDisplayName("Paperizer")
     app.setOrganizationName("Humanitas Labs & Kai")
-    app.setDesktopFileName("paperize-gui")
+    app.setDesktopFileName("paperizer")
 
     # Load Vector Icon
     base_dir = Path(__file__).resolve().parent.parent.parent

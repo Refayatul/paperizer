@@ -31,6 +31,7 @@ class SplitPreviewCanvas(QWidget):
 
     zoomChanged = Signal(float)
     dividerMoved = Signal(float)
+    activityDetected = Signal()
 
     def __init__(self, parent: QWidget | None = None):
         super().__init__(parent)
@@ -47,7 +48,7 @@ class SplitPreviewCanvas(QWidget):
         self._pan_offset: QPointF = QPointF(0, 0)
 
         self._zoom: float = 1.0  # 1.0 = 100%
-        self._view_mode: ViewMode = ViewMode.SPLIT
+        self._view_mode: ViewMode = ViewMode.PAPERIZED
         self._divider_hovered: bool = False
         self._page_shadow_color = QColor(0, 0, 0, 80)
         self._placeholder_text = "Drop a PDF to begin reading on paper\nor press Ctrl+O"
@@ -297,6 +298,7 @@ class SplitPreviewCanvas(QWidget):
 
     # Mouse & Interactive Split Dragging Events
     def mousePressEvent(self, event: QMouseEvent) -> None:
+        self.activityDetected.emit()
         if event.button() == Qt.MouseButton.LeftButton:
             page_rect = self._get_page_rect()
             if self._view_mode == ViewMode.SPLIT and not page_rect.isEmpty():
@@ -324,6 +326,7 @@ class SplitPreviewCanvas(QWidget):
             self.setCursor(Qt.CursorShape.ClosedHandCursor)
 
     def mouseMoveEvent(self, event: QMouseEvent) -> None:
+        self.activityDetected.emit()
         page_rect = self._get_page_rect()
 
         if self._is_dragging_divider and not page_rect.isEmpty():

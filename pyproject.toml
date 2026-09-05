@@ -31,6 +31,7 @@ dependencies = [
 ]
 
 [project.scripts]
+paperizer = "paperize_gui.app:main"
 paperize-gui = "paperize_gui.app:main"
 
 [project.urls]

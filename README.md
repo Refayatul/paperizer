@@ -1,9 +1,9 @@
-# Paperize GUI 📜✨
+# Paperizer 📜✨
 
-> **A quiet, beautiful PDF reader & paper styler for Linux.**  
+> **A quiet, native PDF reader & warm paper styler for Linux.**  
 > Inspired by the distraction-free philosophy of [Humanitas Labs' Paper](https://github.com/humanitas-labs/paper) and built on [Paperize](https://github.com/humanitas-labs/paperize).
 
-![Paperize GUI Banner](assets/icon.svg)
+![Paperizer Banner](assets/icon.svg)
 
 ---
 
@@ -11,9 +11,10 @@
 
 Most PDF readers are covered in bulky toolbars, side panels, and menus that invite you to do everything other than read.
 
-**Paperize GUI puts the document first.**
+**Paperizer puts the document first.**
 - **Full-Bleed Quiet Canvas**: Nothing between you and the reading material.
-- **Floating Translucent Capsule**: A subtle glass pill dock floats quietly at the bottom when you need to change presets, adjust warmth, or export.
+- **Default to Warm Paper**: Opens directly in peaceful, eye-friendly paper mode.
+- **Auto-Fading Capsule**: A subtle glass pill dock floats quietly at the bottom and gently hides after 3 seconds of reading.
 - **Non-Destructive Vector Warmth**: Text, vector graphics, and links are never rasterized or degraded. White glare becomes soft paper.
 - 🎨 **Aesthetic Reading Presets**:
   - **Parchment**: Soft golden-warm antique paper with subtle radial falloff.

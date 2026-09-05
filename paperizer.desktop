@@ -1,0 +1,13 @@
+[Desktop Entry]
+Name=Paperizer
+GenericName=PDF Eye-Comfort & Paper Reader
+Comment=A quiet, native PDF reader and warm paper styler
+Exec=paperizer %U
+Icon=paperizer
+Terminal=false
+Type=Application
+Categories=Office;Graphics;Viewer;Utility;Qt;
+MimeType=application/pdf;
+Keywords=pdf;reader;paper;sepia;parchment;warmth;comfort;accessibility;reading;
+StartupNotify=true
+StartupWMClass=paperizer
