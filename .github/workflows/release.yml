@@ -67,7 +67,7 @@ jobs:
           if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
             VERSION="${GITHUB_REF_NAME#v}"
           else
-            VERSION="0.1.0"
+            VERSION="0.1.1"
           fi
           echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
 
@@ -102,9 +102,54 @@ jobs:
             dist/*.zip
             dist/*.exe
 
+  build-macos:
+    name: Build macOS Packages
+    runs-on: macos-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          python -m pip install .
+
+      - name: Extract version
+        id: get_version
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="0.1.1"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build Application with PyInstaller
+        run: |
+          pyinstaller --noconfirm paperizer.spec
+
+      - name: Create macOS Bundle Zip
+        run: |
+          cd dist
+          ditto -c -k --keepParent Paperizer.app "Paperizer-${{ steps.get_version.outputs.VERSION }}-macOS.zip"
+
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: macos-dist
+          path: |
+            dist/*macOS*.zip
+
   publish-release:
     name: Publish GitHub Release
-    needs: [build-linux, build-windows]
+    needs: [build-linux, build-windows, build-macos]
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
     steps:

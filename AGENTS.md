@@ -73,25 +73,30 @@ When registering on the AUR, use the configured SSH key:
 
 ---
 
-## 3. Multi-Distro Packaging Pipeline
+## 3. Multi-Distro & Cross-Platform Packaging Pipeline
 
-Paperizer produces native packages for all major Linux distributions and Windows:
-- **Arch Linux / CachyOS**: `.pkg.tar.zst` (installable via `sudo pacman -U`)
+Paperizer produces native packages and distribution channels for all major operating systems:
+- **Arch Linux / CachyOS**: `.pkg.tar.zst` (installable via `sudo pacman -U`) & AUR packages
 - **Debian / Ubuntu / Mint**: `.deb` (installable via `sudo apt install`)
 - **Fedora / RHEL / openSUSE**: `.rpm` (installable via `sudo dnf install`)
-- **Universal Python**: `.whl` (installable via `pip install`)
+- **NixOS**: Native flake support via `flake.nix` (`nix run github:Refayatul/paperizer`)
+- **Gentoo**: Native ebuild in `packaging/gentoo/paperizer-0.1.1.ebuild`
+- **Universal Linux (Void, Alpine, Solus, Slackware) & macOS**: `.whl` via `pipx install <wheel>`
 - **Windows 10 / 11 Setup Installer**: `Paperizer-x.x.x-Setup-x64.exe` (Inno Setup installer with Desktop/Start menu icons and `.pdf` shell context menu)
 - **Windows 10 / 11 Portable**: `Paperizer-x.x.x-Windows-Portable.zip` (PyInstaller standalone folder, zero installation needed)
+- **macOS**: `Paperizer-x.x.x-macOS.zip` (PyInstaller `.app` bundle via `macos-latest` runner)
 
-### Windows Packaging Architecture
-- **Specification**: `paperizer.spec` collects PySide6, pikepdf, and pymupdf assets and bundles into a standalone directory.
-- **Inno Setup Script**: `packaging/windows/paperizer.iss` builds the setup installer and registers `SystemFileAssociations\.pdf\shell\Paperizer` for right-click "Open with Paperizer".
+### Packaging Architecture
+- **PyInstaller Specification**: `paperizer.spec` collects PySide6, pikepdf, pymupdf, and OS-appropriate icon (`.ico` on Windows, `.icns` on macOS, `.svg` on Linux).
+- **Inno Setup Script**: `packaging/windows/paperizer.iss` builds the Windows setup installer and registers `SystemFileAssociations\.pdf\shell\Paperizer`.
+- **Nix Flake**: `flake.nix` exposes `packages.default` and `apps.default` for instant `nix run` and system package integration.
+- **Gentoo Ebuild**: `packaging/gentoo/paperizer-0.1.1.ebuild` integrates with Portage via `distutils-r1` and `hatchling`.
 - **Taskbar Icon**: `src/paperize_gui/app.py` registers `SetCurrentProcessExplicitAppUserModelID` on `win32` so the taskbar icon never reverts to generic python.exe.
-- **Multi-Resolution Icon**: `assets/icon.ico` contains 16x16, 32x32, 48x48, 64x64, 128x128, and 256x256 icon formats.
+- **Icon Resources**: `assets/icon.svg` (Linux), `assets/icon.ico` (Windows 16-256px), and `assets/icon.icns` (macOS retina).
 
 ### Packaging Automation
 - **GitHub Actions (`.github/workflows/release.yml`)**:
-  Automatically runs matrix build (`build-linux` on `ubuntu-latest`, `build-windows` on `windows-latest`), and uploads all 6 release assets in one atomic release step.
+  Automatically runs matrix build across `ubuntu-latest`, `windows-latest`, and `macos-latest`, then publishes all artifacts in one atomic release step.
 - **Local Linux Build Script (`scripts/build_all_packages.py`)**:
   Can be run on any Linux system to compile Linux packages locally into `dist/`:
   ```bash

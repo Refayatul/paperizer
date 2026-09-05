@@ -18,6 +18,13 @@ datas += tmp_ret[0]
 binaries += tmp_ret[1]
 hiddenimports += tmp_ret[2]
 
+if sys.platform == 'win32':
+    icon_file = 'assets/icon.ico'
+elif sys.platform == 'darwin':
+    icon_file = 'assets/icon.icns'
+else:
+    icon_file = 'assets/icon.svg'
+
 a = Analysis(
     ['src/paperize_gui/app.py'],
     pathex=['src'],
@@ -48,7 +55,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon='assets/icon.ico',
+    icon=icon_file,
 )
 
 coll = COLLECT(
@@ -60,3 +67,11 @@ coll = COLLECT(
     upx_exclude=[],
     name='Paperizer',
 )
+
+if sys.platform == 'darwin':
+    app = BUNDLE(
+        coll,
+        name='Paperizer.app',
+        icon='assets/icon.icns',
+        bundle_identifier='com.humanitas.paperizer',
+    )
