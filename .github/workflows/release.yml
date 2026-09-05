@@ -10,7 +10,8 @@ permissions:
   contents: write
 
 jobs:
-  build-packages:
+  build-linux:
+    name: Build Linux Packages
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -31,14 +32,94 @@ jobs:
         run: |
           python scripts/build_all_packages.py
 
-      - name: Upload Release Assets
-        uses: softprops/action-gh-release@v2
-        if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v4
         with:
-          files: |
+          name: linux-dist
+          path: |
             dist/*.whl
             dist/*.pkg.tar.zst
             dist/*.deb
             dist/*.rpm
+
+  build-windows:
+    name: Build Windows Packages
+    runs-on: windows-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install pyinstaller
+          python -m pip install .
+
+      - name: Extract version
+        id: get_version
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_name }}" =~ ^v[0-9] ]]; then
+            VERSION="${GITHUB_REF_NAME#v}"
+          else
+            VERSION="0.1.0"
+          fi
+          echo "VERSION=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build Standalone Executable with PyInstaller
+        run: |
+          pyinstaller --noconfirm paperizer.spec
+
+      - name: Create Portable Zip
+        shell: pwsh
+        run: |
+          Compress-Archive -Path dist/Paperizer -DestinationPath "dist/Paperizer-${{ steps.get_version.outputs.VERSION }}-Windows-Portable.zip"
+
+      - name: Build Inno Setup Installer
+        shell: pwsh
+        run: |
+          $isccPath = "ISCC.exe"
+          if (-not (Get-Command iscc -ErrorAction SilentlyContinue)) {
+            if (Test-Path "C:\Program Files (x86)\Inno Setup 6\ISCC.exe") {
+              $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+            } else {
+              choco install innosetup --no-progress
+              $isccPath = "C:\Program Files (x86)\Inno Setup 6\ISCC.exe"
+            }
+          }
+          & $isccPath /DMyAppVersion=${{ steps.get_version.outputs.VERSION }} packaging/windows/paperizer.iss
+
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-dist
+          path: |
+            dist/*.zip
+            dist/*.exe
+
+  publish-release:
+    name: Publish GitHub Release
+    needs: [build-linux, build-windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/') || github.event_name == 'workflow_dispatch'
+    steps:
+      - name: Download all package artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: release-assets
+          merge-multiple: true
+
+      - name: Inspect Release Artifacts
+        run: ls -lh release-assets/
+
+      - name: Upload Release Assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: release-assets/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

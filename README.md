@@ -1,6 +1,6 @@
 # Paperizer 📜✨
 
-> **A quiet, native PDF reader & warm paper styler for Linux.**  
+> **A quiet, native PDF reader & warm paper styler for Linux & Windows.**  
 > Inspired by the distraction-free philosophy of [Humanitas Labs' Paper](https://github.com/humanitas-labs/paper) and built on [Paperize](https://github.com/humanitas-labs/paperize).
 
 ![Paperizer Banner](assets/icon.svg)
@@ -78,7 +78,12 @@ Direct RPM install:
 sudo dnf install https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-1.noarch.rpm
 ```
 
-### 4. Developer / From Source
+### 4. Windows 10 & 11
+
+- **Setup Installer (`.exe`)**: Download `Paperizer-0.1.0-Setup-x64.exe` from [GitHub Releases](https://github.com/Refayatul/paperizer/releases). Includes Start Menu shortcut, Desktop shortcut, uninstaller, and right-click context menu integration (*"Open with Paperizer"* for `.pdf` files).
+- **Portable Standalone (`.zip`)**: Download `Paperizer-0.1.0-Windows-Portable.zip`, extract anywhere, and double-click `Paperizer.exe`. Zero installation or administrative rights required.
+
+### 5. Developer / From Source
 
 ```bash
 # Clone the repository
