@@ -14,11 +14,12 @@ from paperize_gui.main_window import MainWindow
 
 
 def main() -> None:
-    """Launch the Paperize GUI application."""
-    # Ensure smooth Wayland / X11 rendering
+    """Launch the Paperizer application."""
+    # Ensure smooth Wayland / X11 rendering and silence portal noise
     if "QT_QPA_PLATFORM" not in os.environ:
-        # Default to wayland with xcb fallback on Linux
         os.environ["QT_QPA_PLATFORM"] = "wayland;xcb"
+    if "QT_LOGGING_RULES" not in os.environ:
+        os.environ["QT_LOGGING_RULES"] = "qt.qpa.services=false"
 
     app = QApplication(sys.argv)
     app.setApplicationName("paperizer")

@@ -84,13 +84,32 @@ class SplitPreviewCanvas(QWidget):
         self._pan_offset = QPointF(0, 0)
         self.fit_to_page()
 
+    def fit_to_reading(self) -> None:
+        """Fit page to a comfortable, readable book width (no squinting)."""
+        ref_pixmap = self._paperized_pixmap or self._original_pixmap
+        if not ref_pixmap or ref_pixmap.isNull():
+            return
+
+        # Comfortable reading width: ~58% of viewport, clamped between 640px and 860px
+        target_w = min(max(self.width() * 0.58, 640.0), 860.0)
+        target_w = min(target_w, float(max(100, self.width() - 80)))
+        self._zoom = target_w / ref_pixmap.width()
+        self._pan_offset = QPointF(0, 0)
+        self.zoomChanged.emit(self._zoom)
+        self.update()
+
+    def scroll_vertical(self, delta: float) -> None:
+        """Scroll page vertically by delta pixels."""
+        self._pan_offset += QPointF(0, delta)
+        self.update()
+
     def fit_to_page(self) -> None:
         """Fit entire page comfortably within the viewport above the bottom dock."""
         ref_pixmap = self._paperized_pixmap or self._original_pixmap
         if not ref_pixmap or ref_pixmap.isNull():
             return
 
-        # Reserve 80px horizontal margin and 110px vertical margin for floating dock
+        # Reserve 80px horizontal margin and 120px vertical margin for floating dock
         available_w = max(50, self.width() - 80)
         available_h = max(50, self.height() - 120)
 
@@ -124,7 +143,7 @@ class SplitPreviewCanvas(QWidget):
         self.update()
 
     def _get_page_rect(self) -> QRectF:
-        """Calculate on-screen target rect for the rendered page centered above the dock."""
+        """Calculate on-screen target rect for the rendered page."""
         ref_pixmap = self._paperized_pixmap or self._original_pixmap
         if not ref_pixmap or ref_pixmap.isNull():
             return QRectF()
@@ -132,10 +151,15 @@ class SplitPreviewCanvas(QWidget):
         target_w = ref_pixmap.width() * self._zoom
         target_h = ref_pixmap.height() * self._zoom
 
-        # Center in the available canvas area above the floating dock (leaving 40px bias)
-        usable_h = self.height() - 60
         x = (self.width() - target_w) / 2.0 + self._pan_offset.x()
-        y = max(16.0, (usable_h - target_h) / 2.0) + self._pan_offset.y()
+
+        usable_h = self.height() - 60
+        if target_h <= usable_h:
+            # Whole page fits: center it vertically
+            y = max(16.0, (usable_h - target_h) / 2.0) + self._pan_offset.y()
+        else:
+            # Page is taller than window: start at comfortable top margin for immediate reading
+            y = 24.0 + self._pan_offset.y()
 
         return QRectF(x, y, target_w, target_h)
 

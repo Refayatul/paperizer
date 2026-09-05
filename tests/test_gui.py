@@ -95,3 +95,26 @@ def test_main_window_lifecycle(qapp, sample_pdf: Path):
     assert win.current_page_index == 1
 
     win.close()
+
+
+def test_canvas_reading_fit(qapp, sample_pdf: Path):
+    state = PdfDocumentState(sample_pdf)
+    orig = state.render_original_page(0, dpi=72)
+    paper = state.render_paperized_page(0, preset_name="parchment", strength=0.85, dpi=72)
+
+    canvas = SplitPreviewCanvas()
+    canvas.resize(1200, 800)
+    canvas.set_pixmaps(orig, paper)
+
+    # Test fit_to_reading
+    canvas.fit_to_reading()
+    assert canvas._zoom > 0.2
+    assert canvas._zoom <= 4.0
+
+    # Test scroll_vertical
+    initial_y = canvas._pan_offset.y()
+    canvas.scroll_vertical(-100)
+    assert canvas._pan_offset.y() == initial_y - 100
+
+    state.close()
+

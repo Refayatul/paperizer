@@ -130,6 +130,7 @@ class MainWindow(QMainWindow):
         self.current_doc_state: PdfDocumentState | None = None
         self.current_page_index: int = 0
         self._current_request_id: int = 0
+        self._initial_fit_done: bool = False
 
         # Debounce timer for smooth slider changes
         self._preview_debounce_timer = QTimer(self)
@@ -276,9 +277,6 @@ class MainWindow(QMainWindow):
         pos_y = self.height() - dock_h - 24
         self.pill_dock.setGeometry(pos_x, pos_y, dock_w, dock_h)
 
-        if self.canvas._original_pixmap:
-            self.canvas.fit_to_page()
-
     def _setup_shortcuts(self) -> None:
         # File shortcuts
         QShortcut(QKeySequence("Ctrl+O"), self, self._on_open_file_dialog)
@@ -297,6 +295,25 @@ class MainWindow(QMainWindow):
 
         # Toggle view mode
         QShortcut(QKeySequence("Tab"), self, self._cycle_view_mode)
+
+        # Reading & Zoom controls
+        QShortcut(QKeySequence("+"), self, self.canvas.zoom_in)
+        QShortcut(QKeySequence("="), self, self.canvas.zoom_in)
+        QShortcut(QKeySequence("Ctrl++"), self, self.canvas.zoom_in)
+        QShortcut(QKeySequence("Ctrl+="), self, self.canvas.zoom_in)
+        QShortcut(QKeySequence("-"), self, self.canvas.zoom_out)
+        QShortcut(QKeySequence("Ctrl+-"), self, self.canvas.zoom_out)
+        QShortcut(QKeySequence("0"), self, self.canvas.fit_to_reading)
+        QShortcut(QKeySequence("Ctrl+0"), self, self.canvas.fit_to_reading)
+        QShortcut(QKeySequence("R"), self, self.canvas.fit_to_reading)
+        QShortcut(QKeySequence("W"), self, self.canvas.fit_to_width)
+        QShortcut(QKeySequence("P"), self, self.canvas.fit_to_page)
+
+        # Smooth vertical scroll shortcuts
+        QShortcut(QKeySequence("Up"), self, lambda: self.canvas.scroll_vertical(90))
+        QShortcut(QKeySequence("Down"), self, lambda: self.canvas.scroll_vertical(-90))
+        QShortcut(QKeySequence("PageUp"), self, lambda: self.canvas.scroll_vertical(350))
+        QShortcut(QKeySequence("PageDown"), self, lambda: self.canvas.scroll_vertical(-350))
 
         # Fullscreen (F, F11)
         QShortcut(QKeySequence("F"), self, self._toggle_fullscreen)
@@ -342,6 +359,7 @@ class MainWindow(QMainWindow):
 
             self.current_doc_state = PdfDocumentState(path)
             self.current_page_index = 0
+            self._initial_fit_done = False
             self.lbl_pages.setText(f"1 / {self.current_doc_state.page_count}")
             self.setWindowTitle(path.name)
 
@@ -390,10 +408,10 @@ class MainWindow(QMainWindow):
 
     def _on_preview_ready(self, req_id: int, orig_pix, paper_pix) -> None:
         if req_id == self._current_request_id:
-            first_load = (self.canvas._original_pixmap is None)
             self.canvas.set_pixmaps(orig_pix, paper_pix)
-            if first_load:
-                self.canvas.fit_to_page()
+            if not self._initial_fit_done:
+                self.canvas.fit_to_reading()
+                self._initial_fit_done = True
 
     def _on_preview_failed(self, req_id: int, error_msg: str) -> None:
         pass
