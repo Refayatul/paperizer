@@ -12,7 +12,7 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 DIST_DIR = ROOT_DIR / "dist"
 DIST_DIR.mkdir(exist_ok=True)
 
-VERSION = "0.1.0"
+VERSION = "0.1.1"
 PKG_NAME = "paperizer"
 WHEEL_NAME = f"{PKG_NAME}-{VERSION}-py3-none-any.whl"
 WHEEL_PATH = DIST_DIR / WHEEL_NAME

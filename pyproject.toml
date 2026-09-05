@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "paperizer"
-version = "0.1.0"
+version = "0.1.1"
 description = "A quiet, native PDF reader & warm paper styler for Linux"
 readme = "README.md"
 requires-python = ">=3.11"

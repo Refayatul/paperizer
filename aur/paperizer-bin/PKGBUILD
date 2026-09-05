@@ -2,10 +2,9 @@
 # Contributor: Humanitas Labs (Paperize core)
 
 pkgname=paperizer-bin
-_pkgname=paperizer
-pkgver=0.1.0
+pkgver=0.1.1
 pkgrel=1
-pkgdesc="A quiet, native PDF reader & warm paper styler for Linux (pre-built release)"
+pkgdesc="A quiet, native PDF reader & warm paper styler for Linux"
 arch=('any')
 url="https://github.com/Refayatul/paperizer"
 license=('MIT')
@@ -19,22 +18,22 @@ makedepends=(
     'python-installer'
 )
 provides=('paperizer' 'paperize-gui')
-conflicts=('paperizer' 'paperizer-git' 'paperize-gui')
+conflicts=('paperizer-git' 'paperize-gui')
 source=(
-    "https://github.com/Refayatul/paperizer/releases/download/v${pkgver}/${_pkgname}-${pkgver}-py3-none-any.whl"
+    "https://github.com/Refayatul/paperizer/releases/download/v${pkgver}/${pkgname}-${pkgver}-py3-none-any.whl"
     "https://raw.githubusercontent.com/Refayatul/paperizer/v${pkgver}/paperizer.desktop"
     "https://raw.githubusercontent.com/Refayatul/paperizer/v${pkgver}/assets/icon.svg"
     "https://raw.githubusercontent.com/Refayatul/paperizer/v${pkgver}/LICENSE"
 )
 sha256sums=(
-    '6af1a07ac9f171d09f0b59dbf9390a54290c3d7353daacec5ca718daa338bb4d'
+    '2ab9bae76fcaf044a6608015760f9e7f9872f0b3c2b739a9798391097ab843f5'
     'c033818bd6f2258dde9ac6dc8ec8554214cc7df53ec32fdf488f4742ca2aafba'
     '08f4aa4c0960bafb3481a56f034872808ef337c241fb6d9ae2a2a2861375a363'
     'eab257ca89e04dfdad0aaa676e0e3ce7abb52cee6d318ef3b2cb4c1d1f877ffd'
 )
 
 package() {
-    python -m installer --destdir="${pkgdir}" "${srcdir}/${_pkgname}-${pkgver}-py3-none-any.whl"
+    python -m installer --destdir="${pkgdir}" "${srcdir}/${pkgname}-${pkgver}-py3-none-any.whl"
 
     install -Dm644 "${srcdir}/paperizer.desktop" "${pkgdir}/usr/share/applications/paperizer.desktop"
     install -Dm644 "${srcdir}/icon.svg" "${pkgdir}/usr/share/icons/hicolor/scalable/apps/paperizer.svg"

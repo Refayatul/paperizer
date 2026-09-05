@@ -53,7 +53,7 @@ graph TD
 
 **Direct native install (1-liner):**
 ```bash
-sudo pacman -U https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-1-any.pkg.tar.zst
+sudo pacman -U https://github.com/Refayatul/paperizer/releases/download/v0.1.1/paperizer-0.1.1-1-any.pkg.tar.zst
 ```
 
 **Or via AUR:**
@@ -67,21 +67,21 @@ yay -S paperizer-git
 
 Download and install the native `.deb`:
 ```bash
-curl -LO https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer_0.1.0-1_all.deb
-sudo apt install ./paperizer_0.1.0-1_all.deb
+curl -LO https://github.com/Refayatul/paperizer/releases/download/v0.1.1/paperizer_0.1.1-1_all.deb
+sudo apt install ./paperizer_0.1.1-1_all.deb
 ```
 
 ### 3. Fedora / RHEL / openSUSE
 
 Direct RPM install:
 ```bash
-sudo dnf install https://github.com/Refayatul/paperizer/releases/download/v0.1.0/paperizer-0.1.0-1.noarch.rpm
+sudo dnf install https://github.com/Refayatul/paperizer/releases/download/v0.1.1/paperizer-0.1.1-1.noarch.rpm
 ```
 
 ### 4. Windows 10 & 11
 
-- **Setup Installer (`.exe`)**: Download `Paperizer-0.1.0-Setup-x64.exe` from [GitHub Releases](https://github.com/Refayatul/paperizer/releases). Includes Start Menu shortcut, Desktop shortcut, uninstaller, and right-click context menu integration (*"Open with Paperizer"* for `.pdf` files).
-- **Portable Standalone (`.zip`)**: Download `Paperizer-0.1.0-Windows-Portable.zip`, extract anywhere, and double-click `Paperizer.exe`. Zero installation or administrative rights required.
+- **Setup Installer (`.exe`)**: Download `Paperizer-0.1.1-Setup-x64.exe` from [GitHub Releases](https://github.com/Refayatul/paperizer/releases). Includes Start Menu shortcut, Desktop shortcut, uninstaller, and right-click context menu integration (*"Open with Paperizer"* for `.pdf` files).
+- **Portable Standalone (`.zip`)**: Download `Paperizer-0.1.1-Windows-Portable.zip`, extract anywhere, and double-click `Paperizer.exe`. Zero installation or administrative rights required.
 
 ### 5. Developer / From Source
 
