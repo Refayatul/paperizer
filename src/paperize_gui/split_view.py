@@ -49,8 +49,8 @@ class SplitPreviewCanvas(QWidget):
         self._zoom: float = 1.0  # 1.0 = 100%
         self._view_mode: ViewMode = ViewMode.SPLIT
         self._divider_hovered: bool = False
-        self._page_shadow_color = QColor(0, 0, 0, 70)
-        self._placeholder_text = "Drop a PDF file here or click 'Open PDF' to begin"
+        self._page_shadow_color = QColor(0, 0, 0, 80)
+        self._placeholder_text = "Drop a PDF to begin reading on paper\nor press Ctrl+O"
 
     def set_pixmaps(self, original: QPixmap | None, paperized: QPixmap | None) -> None:
         """Update both original and paperized pixmaps."""

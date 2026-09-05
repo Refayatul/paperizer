@@ -84,10 +84,10 @@ def test_main_window_lifecycle(qapp, sample_pdf: Path):
     assert win.current_doc_state.page_count == 3
 
     # Switch presets
-    win.radio_sepia.setChecked(True)
+    win.btn_sepia.setChecked(True)
     assert win._get_active_preset_name() == "sepia"
 
-    win.radio_cream.setChecked(True)
+    win.btn_cream.setChecked(True)
     assert win._get_active_preset_name() == "cream"
 
     # Navigation
